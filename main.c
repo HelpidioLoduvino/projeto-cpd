@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpi.h>
 #include "Docs-serial.h"
 #include "Docs-serial.c"
 
-int main(int argc, char *argv[]){
-   int rank, size;
+int main(int argc, char *argv[]) {
+    int rank, size;
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -45,7 +46,7 @@ int main(int argc, char *argv[]){
     // Juntar os armários locais de todos os processos
     Armario *armarios = NULL;
     if (rank == 0) {
-        armarios = (Armario *)malloc(num_armario * sizeof(Armario));
+        armarios = (Armario *)malloc(num_documento * sizeof(Armario));
     }
     MPI_Gather(local_armario, local_num_documento * sizeof(Armario), MPI_BYTE,
                armarios, local_num_documento * sizeof(Armario), MPI_BYTE,
@@ -53,13 +54,13 @@ int main(int argc, char *argv[]){
 
     // Ordenar os armários no processo raiz
     if (rank == 0) {
-        armarios = ordenar_armario(documento);
+        armarios = ordenar_armario(armarios);
 
         // Escrever o arquivo de saída
         FILE *file = fopen("docs.out.txt", "w");
         if (file != NULL) {
-            for (int i = 0; i < documento->num_documento; i++) {
-                fprintf(file, "%d %d\n", documento[i].indice_documento, documento[i].posicao_armario);
+            for (int i = 0; i < num_documento; i++) {
+                fprintf(file, "%d %d\n", documentos[i].indice_documento, documentos[i].posicao_armario);
             }
             fclose(file);
         } else {
@@ -72,6 +73,7 @@ int main(int argc, char *argv[]){
 
     // Limpar a memória alocada
     free(local_documento);
+    free(local_armario);
     MPI_Finalize();
     return 0;
 }

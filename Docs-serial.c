@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "mpi.h"
+
 
 typedef struct documento{
 	int num_assunto, num_documento, num_armario, indice_documento, armario_principal, posicao_armario;
