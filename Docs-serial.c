@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <omp.h>
+#include "mpi.h"
 
 typedef struct documento{
 	int num_assunto, num_documento, num_armario, indice_documento, armario_principal, posicao_armario;
@@ -20,7 +20,7 @@ Documento *ler_file(){
 	Armario *armario;
 	
 	float pontuacao_assunto;
-	FILE *file = fopen("docs.in.txt", "r");
+	FILE *file = fopen("docs.in2.txt", "r");
 	if(file == NULL)
 		printf("\n Erro!");
 	else{
@@ -88,7 +88,6 @@ Armario *calcular_media_assunto(Armario *armario, Documento *documento){
 	int i=0, j, k=0, l=0, cont = 0;
 	double media=0;
 	
-		#pragma omp parallel for private(cont,j)
 	while(cont < (documento->num_documento*documento->num_assunto)){
 		for(j = 0; j < armario[i].quantidade_documento; j++){
 			media = media + armario[i].documento[j].assunto[k];
@@ -116,24 +115,21 @@ Armario *calcular_distancia(Armario *armario, Documento *documento){
 	double distancia=0, matrizMediaAssunto[documento->num_armario][documento->num_assunto],
 	matrizDistanciaDocumentoArmario[documento->num_documento][documento->num_armario];
 	
-	#pragma omp parallel for private(i,j,k)
-	for(i = 0; i < documento->num_armario; i++){
-		for(j = 0; j < armario[i].quantidade_documento; j++){
-			for(k = 0; k < documento->num_documento; k++){
+	for(i = 0; i < documento->num_armario; i++)
+		for(j = 0; j < armario[i].quantidade_documento; j++)
+			for(k = 0; k < documento->num_documento; k++)
 				if(armario[i].documento[j].indice_documento == documento[k].indice_documento){
 					documento[k] = armario[i].documento[j];
 					k = documento->num_documento-1;
 				}
-			}
-		}
-	}
-
+			
 	
-	for(i = 0; i < documento->num_armario; i++){
+	
+	for(i = 0; i < documento->num_armario; i++)
 		for(j = 0; j < documento->num_assunto; j++){
 			matrizMediaAssunto[i][j] = armario[i].media_assunto[j];
 		}
-	}
+	
 	
 	for(i = 0; i < documento->num_documento; i++){
 		for(j = 0; j < documento->num_armario; j++){
@@ -154,6 +150,7 @@ Armario *calcular_distancia(Armario *armario, Documento *documento){
 			}
 		}
 	}
+	
 
 	return armario;
 }
@@ -199,25 +196,25 @@ Armario *ordenar_armario(Documento *documento){
 	Armario *armario;
 	armario = calloc(documento->num_armario, sizeof(Armario));
 	armario->num_armario = documento->num_armario;
+	
 	for(i = 0; i < documento->num_armario; i++){
 		armario[i].media_assunto = calloc(documento->num_assunto, sizeof(double));
 		armario[i].documento = calloc(documento->num_documento, sizeof(Documento));
 		armario[i].quantidade_documento = 0;
 	}
 	
-	for(i = 0; i < documento->num_armario; i++){
-		for(j = 0; j < documento->num_documento; j++){
+	for(i = 0; i < documento->num_armario; i++)
+		for(j = 0; j < documento->num_documento; j++)
 			if(documento[j].posicao_armario == i){
 				armario[i].documento[armario[i].quantidade_documento] = documento[j];
 				armario[i].quantidade_documento++;
 			}
-		}
-	}
+		
 	
-	for(i = 0; i < documento->num_armario; i++){
+	for(i = 0; i < documento->num_armario; i++)
 		for(j = 0; j < armario[i].quantidade_documento; j++)
-			armario[i].documento[i].assunto = calloc(documento->num_assunto, sizeof(double));
-	}
+			armario[i].documento[j].assunto = calloc(documento->num_assunto, sizeof(double));
+	
 	
 	FILE *file = fopen("docs.out.txt", "w");
 	if(file == NULL)
