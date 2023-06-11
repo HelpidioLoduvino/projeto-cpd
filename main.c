@@ -60,10 +60,10 @@ int main(int argc, char *argv[]){
         if (file != NULL) {
             for (int i = 0; i < documento->num_documento; i++) {
                 fprintf(file, "%d %d\n", documento[i].indice_documento, documento[i].posicao_armario);
-            }s
+            }
             fclose(file);
         } else {
-            printf("Erro ao abrir o arquivo de saída!\n");
+            printf("Erro ao abrir o arquivo de saida!\n");
         }
 
         free(armarios);

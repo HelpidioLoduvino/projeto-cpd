@@ -142,12 +142,14 @@ Armario *calcular_distancia(Armario *armario, Documento *documento){
 		documento[i].menor_distancia = matrizDistanciaDocumentoArmario[i][documento->armario_principal];
 	}
 	
-	for(i = 0; i < documento->num_documento; i++)
+	for(i = 0; i < documento->num_documento; i++){
 		for(j = 0; j < documento->num_armario; j++){
 			if(documento[i].menor_distancia > matrizDistanciaDocumentoArmario[i][j]){
 				documento[i].posicao_armario = j;
 				documento[i].menor_distancia = matrizDistanciaDocumentoArmario[i][j];
 			}
+		}
+	}
 	
 
 	return armario;
@@ -211,7 +213,7 @@ Armario *ordenar_armario(Documento *documento){
 	
 	for(i = 0; i < documento->num_armario; i++)
 		for(j = 0; j < armario[i].quantidade_documento; j++)
-			armario[i].documento[i].assunto = calloc(documento->num_assunto, sizeof(double));
+			armario[i].documento[j].assunto = calloc(documento->num_assunto, sizeof(double));
 	
 	
 	FILE *file = fopen("docs.out.txt", "w");
