@@ -20,7 +20,7 @@ Documento *ler_file(){
 	Armario *armario;
 	
 	float pontuacao_assunto;
-	FILE *file = fopen("docs.in2.txt", "r");
+	FILE *file = fopen("docs.in.txt", "r");
 	if(file == NULL)
 		printf("\n Erro!");
 	else{
@@ -88,6 +88,7 @@ Armario *calcular_media_assunto(Armario *armario, Documento *documento){
 	int i=0, j, k=0, l=0, cont = 0;
 	double media=0;
 	
+		#pragma omp parallel for private(cont,j)
 	while(cont < (documento->num_documento*documento->num_assunto)){
 		for(j = 0; j < armario[i].quantidade_documento; j++){
 			media = media + armario[i].documento[j].assunto[k];
@@ -110,12 +111,12 @@ Armario *calcular_media_assunto(Armario *armario, Documento *documento){
 	return armario;
 }
 
-
 Armario *calcular_distancia(Armario *armario, Documento *documento){
 	int i=0, j=0, k=0, l=0, cont = 0;
 	double distancia=0, matrizMediaAssunto[documento->num_armario][documento->num_assunto],
 	matrizDistanciaDocumentoArmario[documento->num_documento][documento->num_armario];
 	
+	#pragma omp parallel for private(i,j,k)
 	for(i = 0; i < documento->num_armario; i++){
 		for(j = 0; j < armario[i].quantidade_documento; j++){
 			for(k = 0; k < documento->num_documento; k++){
